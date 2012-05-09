@@ -1,0 +1,51 @@
+        <div id="edit-card" class="modal hide fade" style="visible: none;">
+          <div class="modal-body">
+            <form class="form-horizontal">
+              <fieldset>
+
+                <legend>
+                  <a class="close" data-dismiss="modal">x</a>
+                  <h3>Edit Card</h3>
+                </legend>
+
+                <div class="control-group">
+                  <label class="control-label" for="edit-front">Front</label>
+                  <div class="controls">
+                    <input type="text" class="input-xlarge" id="edit-front"/>
+                  </div>
+                </div>
+
+                <div class="control-group">
+                  <label class="control-label" for="edit-back">Back</label>
+                  <div class="controls">
+                    <input type="text" class="input-xlarge" id="edit-back"/>
+                  </div>
+                </div>
+
+                <div class="control-group">
+                  <label class="control-label" for="edit-tags">Tags</label>
+                  <div class="controls">
+                    <input type="text" class="input-xlarge" id="edit-tags"/>
+                  </div>
+                </div>
+
+              </fieldset>
+            </form>
+
+            <div class="modal-footer">
+              <div class="row-fluid">
+                <div class="span10">
+                  <div class="btn-toolbar">
+                    <button class="btn btn-primary" id="saveButton">Save changes</button>
+                    <button class="btn" id="cancelButton" data-dismiss="modal">Close</button>
+                  </div>
+                </div>
+                <div class="span2">
+                  <div class="btn-toolbar">
+                    <button class="btn btn-danger" id="deleteButton">Delete</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>

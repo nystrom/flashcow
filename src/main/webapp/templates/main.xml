@@ -1,0 +1,61 @@
+<surround with="wrapper" at="content">
+  <style>
+    .dl-muted dd { font-size: 75%; color: #999999; }
+  </style>
+  <div id="container-fluid">
+    <div class="hero-unit">
+      <h1><bind name="title"/></h1>
+    </div>
+    <div class="row-fluid">
+      <p>Select a running session, or start a new session.</p>
+    </div>
+    <div class="row-fluid">
+      <div class="span6">
+        <h2>Current sessions</h2>
+      </div>
+      <div class="span6">
+        <h2>Tags</h2>
+      </div>
+    </div>
+    <div class="row-fluid">
+      <div class="span6">
+        <div id="sessions">
+          <dl class="dl-muted">
+            <lazy>
+              <foreach name="session" in="sessions">
+                <dt>
+                  <bind name="session.continue"/>
+                </dt>
+                <dd>
+                  <ul class="unstyled">
+                    <li>Started: <bind name="session.started"/></li>
+                    <li>Last accessed: <bind name="session.lastAccessed"/></li>
+                  </ul>
+                </dd>
+              </foreach>
+            </lazy>
+          </dl>
+        </div>
+      </div>
+      <div class="span3">
+        <div id="tags">
+          <dl class="dl-horizontal dl-muted">
+            <lazy>
+              <foreach name="tag" in="tags">
+                <dt>
+                  <bind name="tag.view"/>
+                </dt>
+                <dd>
+                  <bind name="tag.new"/>
+                </dd>
+              </foreach>
+            </lazy>
+          </dl>
+        </div>
+      </div>
+      <div class="span3">
+        <a class="btn" href="/edit">Edit tags</a>
+      </div>
+    </div>
+  </div>
+</surround>

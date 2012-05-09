@@ -1,0 +1,20 @@
+<Configure class="org.eclipse.jetty.webapp.WebAppContext">
+  <Get name="securityHandler">
+    <Set name="loginService">
+<!--
+      <New class="org.eclipse.jetty.security.JDBCLoginService">
+        <Set name="name">Test Realm</Set>
+        <Set name="config">/Users/nystrom/work/teaching/sa4/flash-servlet/users.properties</Set>
+      </New>
+-->
+<!--
+      <New class="org.eclipse.jetty.security.HashLoginService">
+          <Set name="name">Test Realm</Set>
+          <Set name="config">/Users/nystrom/work/teaching/sa4/flash-servlet/realm.properties</Set>
+          <Set name="refreshInterval">0</Set>
+      </New>
+-->
+    </Set>
+  </Get>
+</Configure>
+

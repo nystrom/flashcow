@@ -1,0 +1,17 @@
+<html>
+  <head>
+    <title><bind name="title"/></title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js" type="text/javascript"/>
+    <link href="/bootstrap/css/bootstrap.css" rel="stylesheet"/>
+    <link href="/bootstrap/css/bootstrap-responsive.css" rel="stylesheet"/>
+    <style type="text/css">
+      #container-fluid { margin-left: 1em; margin-right: 1em; margin-bottom: 1em; }
+    </style>
+  </head>
+  <body>
+    <bind name="content"/>
+    <script src="/bootstrap/js/bootstrap.js" type="text/javascript"></script>
+    <embed name="ajax-hack"/>
+  </body>
+</html>

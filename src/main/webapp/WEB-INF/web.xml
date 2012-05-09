@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app>
+  <servlet>
+    <servlet-name>FlashServlet</servlet-name>
+    <servlet-class>flashcow.app.Flashcow$FlashServlet</servlet-class>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>FlashServlet</servlet-name>
+    <url-pattern>/</url-pattern>
+  </servlet-mapping>
+
+</web-app>

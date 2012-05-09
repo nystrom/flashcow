@@ -1,0 +1,36 @@
+<div>
+    <script>
+<![CDATA[
+      function installAjaxHack() {
+        // Don't install on iOS -- it doesn't work.
+        if (navigator.userAgent.match(/(iPod|iPhone|iPad)/)) {
+          return;
+        }
+        
+        $("a.ajax").click(function (x) {
+          $("#ajax-hack").html(
+            "<iframe class='ajax-iframe' " +
+                   " src='" + x.target.href + "'" +
+                   "/>"
+          );
+
+          // This hack is needed for Safari and Firefox.
+          // It's not necessary (but doesn't hurt) on Chrome.
+          $("#ajax-iframe").each(
+            function (index, frame) {
+              frame.contentWindow.location.href = x.target.href;
+            }
+          );
+          return false;
+        });
+      }
+
+      $(function() {
+        $("#ajax-hack").hide();
+        installAjaxHack();
+      });
+]]>
+    </script>
+
+    <div id="ajax-hack"></div>
+</div>

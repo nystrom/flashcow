@@ -1,0 +1,29 @@
+<surround with="wrapper" at="content">
+  <div id="container-fluid">
+    <h1 class="page-header"><bind name="title"/>: Tag cards</h1>
+    <div class="row-fluid">
+      <div id="cards">
+        <lazy>
+          <table class="table table-bordered table-striped">
+            <thead>
+              <tr>
+                <th>Front</th>
+                <th>Back</th>
+                <th>Tags</th>
+              </tr>
+            </thead>
+            <tbody>
+              <foreach name="card" in="cards">
+                <tr>
+                  <td><bind name="card.front"/></td>
+                  <td><bind name="card.back"/></td>
+                  <td><bind name="card.tags"/></td>
+                </tr>
+              </foreach>
+            </tbody>
+          </table>
+        </lazy>
+      </div>
+    </div>
+  </div>
+</surround>

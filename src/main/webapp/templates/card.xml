@@ -1,0 +1,20 @@
+
+<surround with="wrapper" at="content">
+
+    <div id="container-fluid">
+
+      <h3 class="page-header"><bind name="title"/></h3>
+
+      <div class="row-fluid">
+        <div class="span1">Front:</div>
+        <div class="span11"><bind name="front"/></div>
+      </div>
+        
+      <div class="row-fluid">
+        <div class="span1">Back:</div>
+        <div class="span11"><bind name="back"/></div>
+      </div>
+
+    </div>
+
+</surround>

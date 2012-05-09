@@ -1,0 +1,459 @@
+<html>
+  <head>
+    <title>Flash Cow</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js" type="text/javascript"></script>
+    <script src="/jquery.jswipe.js" type="text/javascript"></script>
+    <script type="text/javascript">
+<![CDATA[
+      var flipped = false;
+      var wasFlipped = false;
+
+      var currentCard = null;
+
+      function updateItem() {
+        var json = currentCard;
+
+        $("#card-container .front").html(json.template).find("#text").html(json.frontText).end().find("a#link").attr('href', json.frontLink);
+        $("#card-container .back").html(json.template).find("#text").html(json.backText).end().find("a#link").attr('href', json.backLink);
+
+        $("#card-container .ef").html(json.ef);
+        $("#card-container .right-interval").html(json.interval[5]);
+        $("#card-container .wrong-interval").html(json.interval[0]);
+
+        installAjaxHack();
+
+        showItem();
+      }
+
+      function updateCard(flipped) {
+        if (flipped) {
+          $("div#item .back").show();
+          $("div#item .front").hide();
+        }
+        else {
+          $("div#item .front").show();
+          $("div#item .back").hide();
+        }
+
+        $("div#item h1").each(function (index, element) {
+          var thresh = 70;
+          $(element).css("font-size", "60px");
+          if ($(element).height() > thresh) {
+            $(element).css("font-size", "48px");
+          }
+          if ($(element).height() > thresh) {
+            $(element).css("font-size", "36px");
+          }
+          if ($(element).height() > thresh) {
+            $(element).css("font-size", "30px");
+          }
+          if ($(element).height() > thresh) {
+            $(element).css("font-size", "24px");
+          }
+          if ($(element).height() > thresh) {
+            $(element).css("font-size", "18px");
+          }
+          if ($(element).height() > thresh) {
+            $(element).css("font-size", "12px");
+          }
+        });
+      }
+
+      function showItem() {
+        $(".before-next").show();
+        $(".after-next").hide();
+        updateCard(flipped);
+      }
+
+      function flip() {
+        flipped = ! flipped;
+        wasFlipped = wasFlipped || flipped;
+        showItem();
+      }
+
+      var time0 = 0;
+
+      function beginTimer() {
+        time0 = new Date().getTime();
+      }
+
+      function scoreFromTime() {
+        if (time0 == 0) {
+          return 5;
+        }
+        var time1 = new Date().getTime();
+        var delta = time1 - time0;
+        // $("div#status-alert-info").html("delta: " + delta);
+        if (delta > 30000) {
+          // not paying attention
+          // $("div#status-alert-info").html("Pay attention!");
+          return 3;
+        }
+        var q = (10 - Math.floor(delta / 1500.));
+        if (q <= 0)
+          return 1;
+        if (q > 10)
+          return 10;
+        return q;
+      }
+
+      function resetToFront() {
+        flipped = false;
+        wasFlipped = false;
+      }
+   
+      function poll() {
+        $.ajax({
+          url: "/poll",
+          success: function (x) {
+            currentCard = x;
+
+            resetToFront();
+            clearStatus();
+            updateItem();
+            beginTimer();
+          },
+          dataType: "json"
+        });
+      }
+
+      function next(score) {
+        var itemId = currentCard.itemId;
+
+        var timeout = new Date().getTime() + 2000;
+
+        $.ajax({
+          url: "/next",
+          data: { score: score, item: itemId },
+          success: function (x) {
+            $.ajax({
+              url: "/poll",
+              success: function (x) {
+                currentCard = x;
+
+                var now = new Date().getTime();
+
+                if (now > timeout) {
+                  resetToFront();
+                  clearStatus();
+                  updateItem();
+                  beginTimer();
+                }
+                else {
+                  setTimeout(function () {
+                    resetToFront();
+                    clearStatus();
+                    updateItem();
+                    beginTimer();
+                  }, timeout - now);
+                }
+              },
+              dataType: "json"
+            });
+          },
+          dataType: "html"
+        });
+      }
+
+      function updateRight() {
+        var score = wasFlipped ? 1 : scoreFromTime();
+        updateStatus(score);
+        updateCard(true);
+        next(score);
+      }
+
+      function bury() {
+        var itemId = currentCard.itemId;
+        $.ajax({
+          url: "/bury",
+          data: { item: itemId },
+          success: function (x) {
+            poll();
+          },
+          dataType: "html"
+        });
+      }
+
+      function updateWrong() {
+        updateStatus(0);
+        updateCard(true);
+        next(0);
+      }
+
+      function updateStatus(score) {
+        var front = currentCard.frontText;
+        var back = currentCard.backText;
+
+        $("#card-container .frontAnswer").html(front);
+        $("#card-container .backAnswer").html(back);
+        $("#card-container .score").html(score);
+        $("#card-container .next-interval").html(currentCard.interval[score]);
+
+        if (score != 0) {
+          $("div#status-alert-info").hide();
+          $("div#status-alert-error").hide();
+          $("div#status-alert-success").fadeIn();
+        }
+        else {
+          $("div#status-alert-success").hide();
+          $("div#status-alert-info").hide();
+          $("div#status-alert-error").fadeIn();
+        }
+      }
+
+      function clearStatus() {
+        $("div#status-alert-success").hide();
+        $("div#status-alert-error").hide();
+        $("div#status-alert-info").show();
+      }
+
+      $(function() {
+        $("#edit-card").modal({show: false});
+        $("#edit-card").modal("hide");
+
+        $("div#item .data").hide();
+
+        showItem();
+        
+        $("div#status-alert-error").hide();
+        $("div#status-alert-success").hide();
+
+        if (window.navigator.standalone) {
+          $.ajaxSetup({ isLocal: true });
+        }
+
+        $("button#rightButton").click(function() {
+          updateRight();
+          return false;
+        });
+
+        $("button#wrongButton").click(function() {
+          updateWrong();
+          return false;
+        });
+
+        $("button#buryButton").click(function() {
+          bury();
+          return false;
+        });
+
+        $("button#nextButton").click(function() {
+          $(".before-next").hide();
+          $(".after-next").show();
+          updateRight();
+          return false;
+        });
+
+        $("button#flipButton").click(function() {
+          flip();
+          return false;
+        });
+
+        $("button#pollButton").click(function() {
+          poll();
+          return false;
+        });
+
+        $("button#saveButton").click(function() {
+          var o = {
+            back: $("#edit-back").html(),
+            front: $("#edit-front").html(),
+            tags: $("#edit-tags").html(),
+            card: currentCard.cardId
+          };
+
+          // Save locally
+          currentCard.backText = o.back;
+          currentCard.frontText = o.front;
+          currentCard.tags = o.tags;
+
+          // Save remotely
+          $.get("/save", o, function() {
+             poll();
+          });
+
+          $("div#edit-card").modal("hide");
+
+          return false;
+        });
+
+        $("button#deleteButton").click(function() {
+          var o = {
+            card: currentCard.cardId
+          };
+          $.get("/delete", o, function() {
+             poll();
+          });
+          $("div#edit-card").modal("hide");
+          return false;
+        });
+
+        $("button#cancelButton").click(function() {
+          $("div#edit-card").modal("hide");
+          return false;
+        });
+
+        $("button#editButton").click(function() {
+          $("div#edit-card").modal("show");
+          $("div#edit-card #edit-front").val(currentCard.frontText);
+          $("div#edit-card #edit-back").val(currentCard.backText);
+          $("div#edit-card #edit-tags").val(currentCard.tags);
+          return false;
+        });
+
+        // Event listener to determine change (horizontal/portrait)
+        document.addEventListener("orientationChanged", updateOrientation); 
+
+        function updateOrientation(e) {
+          switch (e.orientation) {
+            case 0: break;
+            case -90: break;
+            case 90: break;
+            default: break;
+          }
+          // Adjust font-sizes.
+          showItem();
+        }
+
+        poll();
+      });
+]]>
+    </script>
+    <link href="/bootstrap/css/bootstrap.css" rel="stylesheet"/>
+    <link href="/bootstrap/css/bootstrap-responsive.css" rel="stylesheet"/>
+    <style type="text/css">
+<![CDATA[
+      @import url(http://fonts.googleapis.com/css?family=PT+Sans:400,700,400italic,700italic);
+
+      @media (max-width: 480px) {
+        .hero-unit h1 { font-size: 30px; }
+        #item h1 { font-size: 30px; }
+      }
+
+      @media (min-width: 961px) {
+        #item h1 { font-size: 60px; }
+      }
+
+      #item h1 {
+        min-height: 20px;
+        padding-bottom: 19px;
+        padding-top: 19px;
+        margin-bottom: 20px;
+      }
+
+
+body, html, p,
+  input,
+  button,
+  select,
+  textarea {
+  font-family: "PT Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+/* Except for Bootstrap buttons, where it looks weird. */
+.btn {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+
+      #container-fluid { margin-left: 1em; margin-right: 1em; }
+]]>
+    </style>
+  </head>
+  <body>
+    <div id="container-fluid" class="swipe">
+      <div class="page-header">
+        <h1>Flash Cow</h1>
+      </div>
+
+      <div id="card-container">
+        <div id="alerts" class="row-fluid">
+          <div class="span12">
+            <div class="alert alert-error" id="status-alert-error">
+              Score: <span class="score">Score</span>.
+              The card will reappear in about <span class="next-interval">1</span> cards.
+              Score: <span class="score">Score</span>
+              <span class="pull-right">
+                <span class="frontAnswer" style="visible: none;">Front</span>
+                /
+                <span class="backAnswer" style="visible: none;">Back</span>
+              </span>
+            </div>
+            <div class="alert alert-success" id="status-alert-success">
+              Score: <span class="score">Score</span>.
+              The card will reappear in about <span class="next-interval">1</span> cards.
+              <span class="pull-right">
+                <span class="frontAnswer" style="visible: none;">Front</span>
+                /
+                <span class="backAnswer" style="visible: none;">Back</span>
+              </span>
+            </div>
+            <div class="alert alert-info" id="status-alert-info">
+              EF score: <span class="ef">0</span>
+              /
+              <span class="right-interval">0</span> cards when right
+              /
+              <span class="wrong-interval">0</span> cards when wrong
+            </div>
+          </div>
+        </div>
+
+        <div id="card" class="row-fluid">
+          <div class="span12">
+            <div id="item" class="well well-large">
+              <div class="front"><h1>&#160;</h1></div>
+              <div class="back" style="visible: none;"><h1>Back</h1></div>
+            </div>
+          </div>
+        </div>
+
+        <div id="buttons" class="row-fluid">
+          <div class="span6">
+            <div class="btn-toolbar">
+              <div class="after-next">
+                <button class="btn btn-success btn-large" id="rightButton">Got it!</button>
+              </div>
+              <div class="before-next">
+                <button class="btn btn-success btn-large" id="nextButton">Next</button>
+              </div>
+            </div>
+          </div>
+          <div class="span6 pull-right">
+            <div class="after-next">
+              <div class="btn-toolbar pull-right">
+                <button class="btn btn-danger btn-large" id="wrongButton">Dunno!</button>
+              </div>
+            </div>
+            <div class="before-next">
+              <div class="btn-toolbar pull-right">
+                <button class="btn btn-primary btn-large" id="flipButton">Flip</button>
+                <button class="btn btn-danger btn-large" id="wrongButton">Dunno!</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <hr/>
+        <div id="more-buttons" class="row-fluid">
+          <div class="span6">
+            <div class="btn-toolbar">
+              <button class="btn" id="buryButton">Bury</button>
+            </div>
+          </div>
+          <div class="span6">
+            <div class="btn-toolbar pull-right">
+              <button class="btn" id="pollButton">Refresh</button>
+              <button class="btn" id="editButton" data-toggle="modal" data-target="#edit-card">Edit</button>
+            </div>
+          </div>
+        </div>
+
+        <embed name="edit-card"/>
+
+      </div>
+    </div>
+
+    <script src="/bootstrap/js/bootstrap.js" type="text/javascript"></script>
+
+    <embed name="ajax-hack"/>
+  </body>
+</html>

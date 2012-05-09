@@ -13,10 +13,10 @@ import org.squeryl.PrimitiveTypeMode._
 import flashcow.core._
 
 trait FlashcowView extends View {
-  self: Vars with Replies =>
+  self: Flashcow =>
 
   import FlashcowModel._
-  
+
   def renderSession(session: LearningSession): NodeSeq = {
     <ul>
       {
@@ -32,7 +32,7 @@ trait FlashcowView extends View {
   def jsonItem(item: LearningItem): Map[Symbol, Any] = {
     val card = item.card
 
-    val intervals: Seq[Int] = (0 to 5) map { i => nextEFAndInterval(item, i, false) } map { _._2 }
+    val intervals: Seq[Int] = (0 to 10) map { i => nextEFAndInterval(item, i, false) } map { _._2 }
 
     val m = Map(
       'rank -> item.rank,

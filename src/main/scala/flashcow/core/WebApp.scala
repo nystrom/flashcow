@@ -3,6 +3,7 @@ package flashcow.core
 import javax.servlet.http._
 import javax.servlet.AsyncContext
 import javax.servlet.ServletConfig
+import java.io.File
 import scala.xml._
 
 import org.squeryl.SessionFactory
@@ -11,6 +12,10 @@ import org.squeryl.adapters.H2Adapter
 import org.squeryl.PrimitiveTypeMode._
 
 abstract class WebApp extends HttpServlet with Routing with Replies with View with Vars {
+  def rootDirectory = System.getProperty("user.dir")
+  def staticDirectory = rootDirectory + "/src/main/webapp/static".replace("/", File.separator)
+  def templateDirectory = rootDirectory + "/src/main/webapp/templates".replace("/", File.separator)
+
   def database: Option[String] = None
   def databaseEnabled = database != None
 
@@ -38,7 +43,7 @@ abstract class WebApp extends HttpServlet with Routing with Replies with View wi
 
         SessionFactory.concreteFactory = Some(() =>
           Session.create(
-            java.sql.DriverManager.getConnection("jdbc:h2:" + System.getProperty("user.dir") + java.io.File.separator + db),
+            java.sql.DriverManager.getConnection("jdbc:h2:" + rootDirectory + java.io.File.separator + db),
             new H2Adapter))
       case None =>
     }

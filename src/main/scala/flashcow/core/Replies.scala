@@ -202,25 +202,17 @@ trait Replies {
     import java.io.File
 
     def apply(path: Seq[String]): Reply = {
-      val fullPath =
-        ( System.getProperty("user.dir") ::
-          "src" ::
-          "main" ::
-          "webapp" ::
-          "static" :: Nil) ++ path
-
-      val file = new File(fullPath.mkString(File.separator))
+      val file = new File(staticDirectory, path.mkString(File.separator))
       println("static file " + path.mkString(" / "))
       println(" file " + file)
       println(" exists " + file.exists)
 
       if (file.exists && file.isFile)
-        SourceReply(scala.io.Source.fromFile(file)).commit
+        SourceReply(scala.io.Source.fromFile(file)(scala.io.Codec.ISO8859)).commit
       else
         NotFound
     }
 
     def apply(f: String): Reply = apply(f.split('/'))
-        // SourceReply(scala.io.Source.fromFile(file)(scala.io.Codec.ISO8859)).commit
   }
 }

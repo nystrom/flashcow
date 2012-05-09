@@ -5,7 +5,7 @@ import javax.servlet.AsyncContext
 import scala.xml._
 
 trait View {
-  self: Vars with Replies =>
+  self: WebApp with Vars with Replies =>
 
   /** Write XML back in a response. */
   def writeXML(resp: HttpServletResponse, ns: NodeSeq) = resp.getWriter.write(new PrettyPrinter(72, 2).formatNodes(ns))
@@ -53,14 +53,8 @@ trait View {
 
     templateMemo(g) {
       println("missed cache for " + g)
-      val rootPath =
-        ( System.getProperty("user.dir") ::
-          "src" ::
-          "main" ::
-          "webapp" ::
-          "templates" :: Nil ).mkString(File.separator)
       val fn = g.replace("/", File.separator) + ".xml"
-      val root = new File(rootPath)
+      val root = new File(templateDirectory)
       val file = new File(root, fn)
 
       if (! file.getCanonicalPath.startsWith(root.getCanonicalPath))

@@ -2,7 +2,7 @@
 <web-app>
   <servlet>
     <servlet-name>FlashServlet</servlet-name>
-    <servlet-class>flashcow.app.Flashcow$FlashServlet</servlet-class>
+    <servlet-class>flashcow.app.Flashcow</servlet-class>
   </servlet>
 
   <servlet-mapping>

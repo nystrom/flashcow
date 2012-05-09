@@ -1,3 +1,4 @@
+// WIP: JS generation interface
 package flashcow.core
 
 object JS {

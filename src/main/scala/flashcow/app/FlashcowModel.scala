@@ -8,7 +8,7 @@ import java.sql.Timestamp
 
 import flashcow.core._
 
-package object FlashcowModel {
+object FlashcowModel {
   object Card { def apply(id: Long) = Schema.cards.lookup(id).get }
   object LearningSession { def apply(id: Long) = Schema.sessions.lookup(id).get }
   object LearningItem { def apply(id: Long) = Schema.items.lookup(id).get }
@@ -125,7 +125,12 @@ package object FlashcowModel {
     ))
     on(items)(item => declare(columns(item.sessionId, item.rank) are (unique, indexed)))
   }
+}
 
+trait FlashcowModel {
+  self : WebApp =>
+
+  import FlashcowModel._
 
   val random = new scala.util.Random
 
@@ -200,7 +205,9 @@ package object FlashcowModel {
     }
   }
 
+  // HACK! Save the data in a text file.
   def saveCSV(s: LearningSession) = {
+    import java.io.File
     val file = "%s%sdata%stag-%s.dat".format(rootDirectory, File.separator, File.separator, s.name)
     val out = new java.io.PrintStream(new java.io.FileOutputStream(file))
     for (item <- s.items) {

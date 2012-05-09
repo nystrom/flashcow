@@ -155,6 +155,7 @@ object Flashcow {
         Schema.prefTable.insert(new Preferences(defaultInterval = 6, minInterval = 6, defaultEF = 2.0, minEF = 1.3))
       }
 
+/*
       txn {
         val user = Schema.users.insert(new User("admin", "OBF:1u2a1toa1w8v1tok1u30"))
         val role = Schema.roles.insert(new Role("User"))
@@ -165,10 +166,10 @@ object Flashcow {
         CRYPT:adpexzg3FUZAk
         */
       }
-
+      */
 
       import java.io.File
-      val dirName = "/Users/nystrom/Dropbox/Elements/Italian/done"
+      val dirName = rootDirectory + File.separator + "data"
       val dir = new File(dirName)
 
       if (dir.exists) {
@@ -190,6 +191,15 @@ object Flashcow {
       }
     }
 
+    val card = param[Long]("card")
+    val item = param[Long]("item")
+    val tag = param[String]("tag")
+    val session = param[Long]("session")
+    val score = param[Int]("score")
+    val tags = param[String]("tags")
+    val front = param[String]("front")
+    val back = param[String]("back")
+
     // Default route -- look for a file
     route {
       case Path(p @ _*) =>
@@ -210,15 +220,6 @@ object Flashcow {
       case Path("card") and card(cardId) =>
         reply(Ok + HTML(cardPage(cardId)) + Commit)
     }
-
-    val card = param[Long]("card")
-    val item = param[Long]("item")
-    val tag = param[String]("tag")
-    val session = param[Long]("session")
-    val score = param[Int]("score")
-    val tags = param[String]("tags")
-    val front = param[String]("front")
-    val back = param[String]("back")
 
     route {
       case Path("tag") and tag(tag) =>
@@ -270,19 +271,8 @@ object Flashcow {
 
     route {
       case Path("poll") =>
-        println("poll")
-        try {
-          updateSessionTime
-          sendCurrentItem
-        }
-        catch {
-          case ex: Exception =>
-            ex.printStackTrace
-            throw ex
-        }
-        finally {
-          println("done with poll")
-        }
+        updateSessionTime
+        sendCurrentItem
     }
 
     route {

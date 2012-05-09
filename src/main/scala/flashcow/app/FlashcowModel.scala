@@ -201,7 +201,7 @@ package object FlashcowModel {
   }
 
   def saveCSV(s: LearningSession) = {
-    val file = "/Users/nystrom/Dropbox/Elements/Italian/done/tag-%s.dat".format(s.name)
+    val file = "%s%sdata%stag-%s.dat".format(rootDirectory, File.separator, File.separator, s.name)
     val out = new java.io.PrintStream(new java.io.FileOutputStream(file))
     for (item <- s.items) {
       out.println("%s|%s|%d|%.2f".format(item.card.frontText, item.card.backText, item.interval, item.ef))
@@ -221,11 +221,11 @@ package object FlashcowModel {
 
     val buf = new scala.collection.mutable.ListBuffer[LearningItem]
 
+    // shuffle
     for (j <- ranks.indices) {
         val mask = (Integer.highestOneBit(count) << 1) - 1
         var i = random.nextInt & mask
         while (i < 0 || i >= count) {
-          // println("i? " + i)
           i = random.nextInt & mask
         }
         
